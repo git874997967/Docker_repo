@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  my_dremio:
+    image: dremio/dremio-oss:latest
+    ports:
+      - 9047:9047 
+      - 31010:31010 
+      - 32010:32010
+      - 45678:45678
+
+  my_postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+         - POSTGRES_PASSWORD=123456
+         - POSTGRES_USER=postgres
+         - POSTGRES_DB=test
+
+  my_spark:
+    image: jupyter/pyspark-notebook:latest
+    ports:
+      - 8888:8888
+      - 4040:4040
+    volumes: 
+      - test:/home/jovyan/work
+    user: root
+    environment:
+       CHOWN_HOME_OPTS: "-R"
+       CHOWN_HOME: yes 
+      
+  my_redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+      - /test/redis.conf:/usr/local/etc/redis/redis.conf
+    entrypoint: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    ports: 
+      - 6379:6379
+
+volumes:
+  test:
+    driver: local
+  redis_data:
+    driver: local 
+ 
